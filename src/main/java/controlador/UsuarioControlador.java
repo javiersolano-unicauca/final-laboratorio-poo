@@ -1,5 +1,6 @@
 package controlador;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -81,8 +82,9 @@ public class UsuarioControlador {
         this.atrApellidoMaterno = prmApellidoMaterno;
     }
 
-    public Date getFechaNacimiento() {
-        return atrFechaNacimiento;
+    public String getFechaNacimiento() {
+        SimpleDateFormat objFormat = new SimpleDateFormat("dd/MM/yyyy");
+        return objFormat.format(atrFechaNacimiento);
     }
 
     public void setFechaNacimiento(Date prmFechaNacimiento) {

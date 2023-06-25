@@ -1,5 +1,6 @@
 package vista;
 
+import Libraries.Arrays.ChainOfCharacter.ChainOfCharacter;
 import controlador.UsuarioControlador;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -52,9 +53,9 @@ public class Main extends JFrame implements ActionListener{
     Etiqueta lblDescripcion = new Etiqueta("Descripcion:", "Arial", 15, 20, 265, 150, 20); 
     Etiqueta lblPreferencias = new Etiqueta("Preferencias:", "Arial", 15, 175, 265, 150, 20);  
     
-    Texto txtNombres = new Texto("", 170, 60, 170, 20);
-    Texto txtApellidoPaterno = new Texto("", 170, 85, 170, 20);
-    Texto txtApellidoMaterno = new Texto("", 170, 110, 170, 20);
+    Texto txtNombres = new Texto("NOMBRES", 170, 60, 170, 20);
+    Texto txtApellidoPaterno = new Texto("APELLIDO PATERNO", 170, 85, 170, 20);
+    Texto txtApellidoMaterno = new Texto("APELLIDO MATERNO", 170, 110, 170, 20);
     JDateChooser calFechaNacimiento = new JDateChooser();
     JRadioButton btnMasculino = new JRadioButton("Masculino");
     JRadioButton btnFemenino = new JRadioButton("Femenino");
@@ -212,42 +213,54 @@ public class Main extends JFrame implements ActionListener{
         }
     }
     
-    private boolean validarDato(String prmDato)
+    private boolean validarDato(Texto txt)
     {
-        return (!prmDato.matches("[0-9]+"));
+        if(!ChainOfCharacter.containsLetters(txt.getText())){
+            txt.setForeground(Color.red);
+            JOptionPane.showMessageDialog(null, "Campo "+txt.getName()+" no valido!", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        txt.setForeground(Color.BLACK);
+        return true;
     }
     
-    private void obtenerNombres()
+    private boolean obtenerNombres()
     {
-        if(!txtNombres.getText().isEmpty())
+        if(!txtNombres.getText().isEmpty() && validarDato(txtNombres)){
             objUsuarioControlador.setNombres(txtNombres.getText());
-//        else if(validarDato(txtNombres.getText()))
-//            JOptionPane.showMessageDialog(null, "NOMBRES no validos!", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        return false;   
     }
     
-    private void obtenerApellidoPaterno()
+    private boolean obtenerApellidoPaterno()
     {
-        if(!txtApellidoPaterno.getText().isEmpty())
+        if(!txtApellidoPaterno.getText().isEmpty() && validarDato(txtApellidoPaterno)){
             objUsuarioControlador.setApellidoPaterno(txtApellidoPaterno.getText());
-//        else if(validarDato(txtApellidoPaterno.getText()))
-//            JOptionPane.showMessageDialog(null, "APELLIDO PATERNO no valido!", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        return false;
     }
     
-    private void obtenerApellidoMaterno()
+    private boolean obtenerApellidoMaterno()
     {
-        if(!txtApellidoMaterno.getText().isEmpty())
+        if(!txtApellidoMaterno.getText().isEmpty() && validarDato(txtApellidoMaterno)){
             objUsuarioControlador.setApellidoMaterno(txtApellidoMaterno.getText());
-//        else if(validarDato(txtApellidoMaterno.getText()))
-//            JOptionPane.showMessageDialog(null, "APELLIDO MATERNO no valido!", "Error", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+        return false;
     }
     
-    private void obtenerFechaNacimiento()
+    private boolean obtenerFechaNacimiento()
     {
-        if(calFechaNacimiento.getDate() != null)
+        if(calFechaNacimiento.getDate() != null){
             objUsuarioControlador.setFechaNacimiento(calFechaNacimiento.getDate());
+            return true;
+        }
+        return false;
     }
     
-    private void obtenerSexo()
+    private boolean obtenerSexo()
     {
         if(btnFemenino.isSelected() || btnMasculino.isSelected()){
             
@@ -256,18 +269,23 @@ public class Main extends JFrame implements ActionListener{
             
             else if(btnMasculino.isSelected() && !btnFemenino.isSelected())
                 objUsuarioControlador.setSexo(EnumSexo.Masculino);
+            return true;
         }
+        return false;
     }
     
-    private void obtenerNacionalidad()
+    private boolean obtenerNacionalidad()
     {
         String varNacionalidad = (String)btnNacionalidad.getSelectedItem();
         
         for(EnumNacionalidad objNacionalidad: EnumNacionalidad.values()){
             
-            if(objNacionalidad.name().equals(varNacionalidad))
+            if(objNacionalidad.name().equals(varNacionalidad)){
                 objUsuarioControlador.setNacionalidad(objNacionalidad);
+                return true;
+            }
         }
+        return false;
     }
     
     private void obtenerDescripcion()
@@ -284,7 +302,7 @@ public class Main extends JFrame implements ActionListener{
         
         for(EnumPreferencia objPreferencia: EnumPreferencia.values()){
             
-            if(objPreferencia.name().equals(varPreferencia))
+            if(objPreferencia.getName().equals(varPreferencia))
                 objUsuarioControlador.setPreferencia(objPreferencia);
         }
     }
@@ -303,23 +321,16 @@ public class Main extends JFrame implements ActionListener{
     
     private void guardar()
     {
-        obtenerNombres();
-        obtenerApellidoPaterno();
-        obtenerApellidoMaterno();
-        obtenerFechaNacimiento();
-        obtenerSexo();
-        obtenerNacionalidad();
-        obtenerDescripcion();
-        obtenerPreferencia();
-        
-        if(!objUsuarioControlador.getNombres().isEmpty() &&
-           !objUsuarioControlador.getApellidoPaterno().isEmpty() &&
-           !objUsuarioControlador.getApellidoMaterno().isEmpty() &&
-           objUsuarioControlador.getFechaNacimiento() != null &&
-           objUsuarioControlador.getSexo() != null &&
-           objUsuarioControlador.getNacionalidad() != null)
+        if(obtenerNombres() &&
+           obtenerApellidoPaterno() &&
+           obtenerApellidoMaterno() &&
+           obtenerFechaNacimiento() &&
+           obtenerSexo() &&
+           obtenerNacionalidad())
         {
-            Image perfil = null;
+            obtenerDescripcion();
+            obtenerPreferencia();
+            Image perfil = new ImageIcon(PERFIL_DESCONOCIDO_ICON).getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
             
             if(btnMostrarPerfil.isSelected()){
                 
@@ -328,9 +339,7 @@ public class Main extends JFrame implements ActionListener{
                        
                 else if(btnMasculino.isSelected() && !btnFemenino.isSelected())
                     perfil = new ImageIcon(PERFIL_HOMBRE_ICON).getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
-            }else
-                perfil = new ImageIcon(PERFIL_DESCONOCIDO_ICON).getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
-            
+            }
             JOptionPane.showMessageDialog(null, obtenerInformacion(), "Informacion del usuario", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(perfil));
         }
         else
@@ -343,14 +352,17 @@ public class Main extends JFrame implements ActionListener{
         txtNombres.setText("");
         txtApellidoPaterno.setText("");
         txtApellidoMaterno.setText("");
-        calFechaNacimiento.cleanup();
+        calFechaNacimiento.setDate(null);
         btnFemenino.setSelected(false);
         btnMasculino.setSelected(false);
         btnNacionalidad.resetKeyboardActions();
-        txtDescripcion.setText("");
+        txtDescripcion.setText(MENSAJE_DESCRIPCION);
         btnPreferencias.clearSelection();
         btnMostrarPerfil.setSelected(true);
         btnMostrarFecha.setSelected(true);
+        ctnPerfilHombre.setVisible(false);
+        ctnPerfilMujer.setVisible(false);
+        ctnPerfil.setVisible(true);
     }
     
     private void salir()

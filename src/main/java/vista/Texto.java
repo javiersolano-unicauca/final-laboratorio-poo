@@ -7,11 +7,20 @@ import javax.swing.JTextField;
  */
 public class Texto extends JTextField {
     
+    private String atrName;
+    
     // Constructors:
-    public Texto(String prmTexto, int x, int y, int width, int height)
+    public Texto(String prmName, int x, int y, int width, int height)
     {
-        super(prmTexto);
+        super();
+        atrName = prmName;
         setBounds(x, y, width, height);
+    }
+    
+    @Override
+    public String getName()
+    {
+        return atrName;
     }
     
 }
